@@ -4,6 +4,10 @@
 #include "CStackAllocator.h"
 #include <vector>
 #include <ctime>
+#include <list>
+#include "gtest/gtest.h"
+#include "GoogleTest.h"
+
 
 
 class Edge{
@@ -19,16 +23,38 @@ public:
 
 class Node {
 private:
-    std::vector<Edge> numbers;
+    std::list<int> numbers;
 public:
     Node() {
-        for (int i = 0; i < 100000; ++i ) {
-            numbers.emplace_back();
+        for (int j = 0; j < 20; ++j) {
+            for (int i = 0; i < 100000; ++i) {
+                numbers.push_front(i);
+            }
+            for (int i = 0; i < 100000; ++i) {
+                numbers.pop_back();
+            }
         }
     }
 };
 
-int main() {
+int main(int argc, char** argv) {
+    //::testing::InitGoogleTest(&argc, argv);
+    StackAllocator<int>* SAllocator = new StackAllocator<int>();
+    CMemoryManagerSwitcher* Switcher = new CMemoryManagerSwitcher(SAllocator);
+
+    std::list<int> l;
+    for (int i = 0; i < 100; ++i) {
+        l.push_back(i);
+    }
+
+    delete Switcher;
+
+    for (auto it = l.begin(); it != l.end(); ++it) {
+        std::cout << *it << " ";
+    }
+    std::cout << "\n";
+
+
     std::vector<int> MyList1;
     std::vector<int> MyList2;
     std::vector<int> MyList3;
@@ -39,7 +65,6 @@ int main() {
     clock_t t;
     t = clock();
 //    for (int i = 0; i < 100000; ++i) {
-//        MyList2.push_back(i);
 //    }
     Node* node1 = new Node();
     t = clock() - t;
@@ -66,7 +91,7 @@ int main() {
     t = clock() - t;
     std::cout << "With Stack Allocator: \n" << t << std::endl;
 
-    delete SwitcherToDefault;
+    delete SwitcherToStack;
     t = clock();
 //    for (int i = 0; i < 100000; ++i) {
 //        MyList3.push_back(i);
@@ -90,9 +115,5 @@ int main() {
 //        std::cout << MyList3[i] << " ";
 //    }
     std::cout << std::endl;
-
-
-
-
-    return 0;
+    //return RUN_ALL_TESTS();
 }

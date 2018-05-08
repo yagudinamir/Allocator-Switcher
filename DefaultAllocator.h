@@ -1,3 +1,4 @@
+#pragma once
 #include "IMemoryManager.h"
 
 class DefaultAllocator : public IMemoryManager {
@@ -13,7 +14,7 @@ public:
         std::free(ptr);
     }
 
-    void Name() {
-        std::cout << "\n DEFAULT \n";
-    }
+//    void Name() override {
+//        std::cout << "\n DEFAULT \n";
+//    }
 };

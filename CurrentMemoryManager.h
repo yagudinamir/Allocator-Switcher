@@ -11,6 +11,8 @@ class CurrentMemoryManager {
 protected:
     static void* Allocate(std::size_t n) {
         return ::operator new(n);
+        //Alloc Free
+
     }
 
     static void Free(void* ptr) {

@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <memory>
 #include <cstdlib>
@@ -18,8 +19,10 @@ public:
     }
 
     ~Block() {
-        if (previous != nullptr)
+        if (previous != nullptr) {
             delete previous;
+            ::free(previous);
+        }
 //            previous->~Block();
         std::free(current_memory_pointer);
     }
@@ -59,16 +62,17 @@ public:
 
     ~SharedAllocator() {
         delete LastBlock;
+        ::free(LastBlock);
     }
 
     template <typename T>
     T* allocate(std::size_t n) {
         if (LastBlock == nullptr) {
-            Block* b = new Block(LastBlock, std::max(n * sizeof(T), block_size));
+            Block* b =  new(::malloc(sizeof(Block))) Block(LastBlock, std::max(n * sizeof(T), block_size));
             LastBlock = b;
             return reinterpret_cast<T*>(LastBlock->allocate(n * sizeof(T)));
         } else if (LastBlock->unused_memory < n * sizeof(T)) {
-            Block* b = new Block(LastBlock, std::max(n * sizeof(T), block_size));
+            Block* b = new(::malloc(sizeof(Block))) Block(LastBlock, std::max(n * sizeof(T), block_size));
             LastBlock = b;
             return reinterpret_cast<T*>(LastBlock->allocate(n * sizeof(T)));
         } else {
@@ -123,9 +127,9 @@ public:
         return;
     }
 
-    void Name() {
-        std::cout << "\n STACK \n";
-    }
+//    void Name() {
+//        std::cout << "\n STACK \n";
+//    }
 
     std::shared_ptr<SharedAllocator> m_allocator;
 };
